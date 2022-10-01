@@ -1,0 +1,13 @@
+---
+packages:
+  - .
+
+extra-deps:
+  - cabal-helper-0.7.3.0@sha256:1ec0e453ac2b600db0767b99546f963f50436186f55f7794cef81f803a2c1b4a,6654
+  - djinn-ghc-0.0.2.3@sha256:0daf55cd1842fe05ca9e1a3dbe868a847a60060066c58420a26cc8662e881efa,816
+  - djinn-lib-0.0.1.4@sha256:b143628933e2721c9668c655ab7ab6dc5eaa20475518459aa49adabaef372599,917
+  - ghc-syb-utils-0.2.3.3@sha256:fc4cd944bbd4d5160b2ee8bb458974a135c0abbd9941fb6e5f9180164efd091a,1302
+  - posix-escape-0.1@sha256:adbb650397cd8685ea220b40739ee80d4e8329643a98aa2993a6f13a598bd18c,1160
+  - fourmolu-0.8.2.0
+
+resolver: lts-18.5

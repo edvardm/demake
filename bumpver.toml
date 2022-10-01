@@ -1,0 +1,12 @@
+[bumpver]
+current_version = "0.1.0"
+version_pattern = "MAJOR.MINOR.PATCH"
+commit_message = "bump version {old_version} -> {new_version}"
+commit = true
+tag = true
+push = true
+
+[bumpver.file_patterns]
+"README.md" = ["{version}"]
+"bumpver.toml" = ['current_version = "{version}"']
+"package.yaml" = ["version: {version}"]
