@@ -17,9 +17,9 @@ dev-init: dev-deps build
 hoogle: gen-local-hoogle
     stack hoogle -- server --local --port=8080
 
-# run for given file
-run file="test/02.mk":
-    stack exec {{PROG}} -- {{ file }}
+# run for given file printing tasks.py to stdout
+run file:
+    @stack exec {{PROG}} -- {{ file }} -o-
 
 # build all targets
 build:
@@ -60,3 +60,24 @@ todo:
 # copy to ~/.local/bin/
 install:
     stack install
+
+
+markdown-filter:
+    #!/usr/bin/env python
+    import sys
+    import re
+    import pathlib
+
+    pattern = r"\{!\s*([\w/\.-]+)\s*!\}"
+    for entry in sys.stdin.readlines():
+        if re.match(pattern, entry):
+            entry = pathlib.Path(re.sub(pattern, "\g<1>", entry).strip()).read_text()
+        sys.stdout.write(entry)
+
+update-examples:
+    just run examples/02.mk > examples/02-tasks.py
+
+mk-readme: update-examples
+    just markdown-filter < .readme.tmpl.md > README.md
+
+

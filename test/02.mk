@@ -1,30 +1,18 @@
 .PHONY: deps
 PROJ := myproj
 
-deps: ## install dependencies
-	pip install poetry
-	poetry install --no-dev
+.PHONY: dev-init
+dev-init: .check-poetry deps quick-test ## prepare project ready for development
 
-foo: foo.o
-	# some funny comment here
-	cc -o $@ $<
+.PHONY: .check-poetry
+.check-poetry:
+	command -v poetry 2>/dev/null || (echo "poetry not found, please see https://python-poetry.org/docs/#installation"; exit 1)
 
-bar: dep_a dep_b
-	@echo running in $(PROJ)
+.PHONY: deps
+deps:  ## install dependencies
+	poetry install --no-root
 
-.PHONY: dep_a
-dep_a:
-	@echo "produce a"
-
-.PHONY: dep_b
-dep_b:
-	@echo "produce b"
-
-.PHONY: install
-install: deps
-
-foo.o: foo.c
-	$(CC) -o $@ $<
-
-foo.c:
-	echo "void main(int argc, char **argv[]); { exit(0); }" > $@
+.PHONY: quick-test
+quick-test: opts ?= --durations 3
+quick-test:
+	pytest $(opts) -m "not slow" tests/
