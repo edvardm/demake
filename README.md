@@ -4,11 +4,11 @@ Version 0.1.0
 
 ## Overview
 
-Helper to convert Makefiles to [PyInvoke](https://www.pyinvoke.org/) files, see [sample run below](https://github.com/edvardm/demake#sample-run)
+Helper to convert Makefiles to [PyInvoke](https://www.pyinvoke.org/) files, see [sample run below](#sample-run)
 
 ## Rationale
 
-Makefiles typically contain rules to build files based on dependencies, whereas PyInvoke is used for task automation. These are two separate things.
+Makefiles typically contain rules to build files based on dependencies, whereas [PyInvoke](https://www.pyinvoke.org/) is used for task automation. These are two separate things.
 
 [GNU Make](https://www.gnu.org/software/make/) is a powerful tool, so it is often used for task automation as well, mainly because it is already present in many development environments, and most people are familiar with the basic syntax.
 
@@ -20,9 +20,9 @@ Sure, complex Make tasks can be extracted to shell scripts, but then the same ar
 
 ## Purpose of Demake
 
-It helps you by transforming some of the rules in existing `Makefile`s to `tasks.py` files used by PyInvoke. It is by no means complete and it is quite likely that you need to modify generated `tasks.py` before it is useful, with the exception of very trivial Makefiles. It should still save you from some manual work, and for me it was a good excuse to do something a bit more serious with Haskell than just to dabble with `ghci` solving [Project Euler](https://projecteuler.net/) problems.
+It helps you by transforming some of the rules in existing `Makefile`s to `tasks.py` files used by PyInvoke. It is by no means complete and it is quite likely that you need to modify generated `tasks.py` before it is useful, with the exception of very trivial Makefiles. It should still save you from some manual work, and for me it was a good excuse to something bit more serious with Haskell than just to dabble with `ghci` solving [Project Euler](https://projecteuler.net/) problems.
 
-## Sample run
+## Sample run<a id="sample-run"></a>
 
 With Makefile contents of
 
@@ -78,10 +78,11 @@ def dev_init(c):
 
 Ideas only, haven't committed to anything yet
 
+- Invent better name (names are hard)
+- Include target-specific comments as PyInvoke comments
 - [Justfile](https://github.com/casey/just) support
 - [Shake](https://github.com/casey/just) support
 
 ## Credits
 
-Nicolas Mattia's [Makefile library](https://github.com/nmattia/makefile),
-which I modified a bit to support parsing of top-level and inline comments
+Nicolas Mattia's [Makefile library](https://github.com/nmattia/makefile), which I modified a bit to support parsing of top-level and inline comments
