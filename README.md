@@ -28,7 +28,7 @@ With Makefile contents of
 
 ```Makefile
 .PHONY: deps
-PROJ := myproj
+TEST_DIR := tests
 
 .PHONY: dev-init
 dev-init: .check-poetry deps quick-test ## prepare project ready for development
@@ -44,7 +44,7 @@ deps:  ## install dependencies
 .PHONY: quick-test
 quick-test: opts ?= --durations 3
 quick-test:
-	pytest $(opts) -m "not slow" tests/
+	pytest $(opts) -m "not slow" $(TEST_DIR)
 ```
 
 Resulting output:
@@ -52,7 +52,7 @@ Resulting output:
 ```python
 from invoke import task
 
-PROJ = "myproj"
+TEST_DIR = "tests"
 
 @task
 def deps(c):
@@ -66,7 +66,7 @@ def _check_poetry(c):
 
 @task
 def quick_test(c):
-    c.run(f'pytest {opts} -m "not slow" tests/')
+    c.run(f'pytest {opts} -m "not slow" {TEST_DIR}')
 
 
 @task(pre=[_check_poetry, deps, quick_test])

@@ -1,6 +1,6 @@
 from invoke import task
 
-PROJ = "myproj"
+TEST_DIR = "tests"
 
 @task
 def deps(c):
@@ -14,7 +14,7 @@ def _check_poetry(c):
 
 @task
 def quick_test(c):
-    c.run(f'pytest {opts} -m "not slow" tests/')
+    c.run(f'pytest {opts} -m "not slow" {TEST_DIR}')
 
 
 @task(pre=[_check_poetry, deps, quick_test])

@@ -1,5 +1,5 @@
 .PHONY: deps
-PROJ := myproj
+TEST_DIR := tests
 
 .PHONY: dev-init
 dev-init: .check-poetry deps quick-test ## prepare project ready for development
@@ -15,4 +15,4 @@ deps:  ## install dependencies
 .PHONY: quick-test
 quick-test: opts ?= --durations 3
 quick-test:
-	pytest $(opts) -m "not slow" tests/
+	pytest $(opts) -m "not slow" $(TEST_DIR)
