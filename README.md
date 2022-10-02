@@ -22,6 +22,18 @@ Sure, complex Make tasks can be extracted to shell scripts, but then the same ar
 
 It helps you by transforming some of the rules in existing `Makefile`s to `tasks.py` files used by PyInvoke. It is by no means complete and it is quite likely that you need to modify generated `tasks.py` before it is useful, with the exception of very trivial Makefiles. It should still save you from some manual work, and for me it was a good excuse to something bit more serious with Haskell than just to dabble with `ghci` solving [Project Euler](https://projecteuler.net/) problems.
 
+## Install instructions
+
+clone the repository, then do
+
+```bash
+stack build && \
+  stack install && \
+  echo "installed to $(stack path --local-bin)"
+```
+
+If you don't have Stack setup already, I recommend using `https://www.haskell.org/ghcup/` to install it. 
+
 ## Sample run<a id="sample-run"></a>
 
 With Makefile contents of
@@ -78,6 +90,7 @@ def dev_init(c):
 
 Ideas only, haven't committed to anything yet
 
+- Homebrew recipe
 - Invent better name (names are hard)
 - Include target-specific comments as PyInvoke comments
 - [Justfile](https://github.com/casey/just) support

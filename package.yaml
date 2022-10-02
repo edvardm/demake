@@ -11,7 +11,7 @@ extra-source-files:
   - CHANGELOG.md
 
 # Metadata used when publishing your package
-synopsis: Parse Makefile to PyInvoke
+synopsis: Parse Makefile to PyInvoke tasks
 category: Console
 
 # To avoid duplicated efforts in documentation and dealing with the
