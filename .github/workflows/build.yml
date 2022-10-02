@@ -18,11 +18,12 @@ jobs:
     strategy:
       matrix:
         stack: [2.9.1]
-        ghc: [8.10.7, 9.0.2]
+        ghc: [8.10.7, 9.2.4]
 
     steps:
       - uses: actions/checkout@v2
-        if: github.event.action == 'opened' || github.event.action == 'synchronize' || github.event.ref == 'refs/heads/main'
+        with:
+          fetch-depth: 1
 
       - uses: haskell/actions/setup@v1
         name: Setup Haskell Stack
@@ -48,21 +49,19 @@ jobs:
         run: |
           stack test --system-ghc --test-arguments=--format=progress --arch x86_64
 
-  release:
-    runs-on: ubuntu-latest
-    name: stack release
-    steps:
-      - name: Prepare release
+      - name: Install
         run: |
-          build_dir=$(stack path --dist-dir)/build/${PROG}
+          stack install --no-run-tests --no-run-benchmarks
 
-          mkdir pkg && \
-            pushd ${PROG} && \
-            cp "$build_dir/${PROG}" ../pkg/ && \
-            popd
+      - name: Prepare build artifact
+        run: |
+          rm -rf pkg && mkdir pkg/
+          cp ~/.local/bin/${PROG} pkg/
+          strip pkg/${PROG}
+          tar cvf ${PROG}-macos-x64.tar.gz pkg/
 
-      - name: Upload release
-        uses: actions/upload-artifact@v1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          name: ${PROG}-${{ runner.os }}
-          path: pkg
+          name: ${PROG}-macos-x64
+          path: pkg/${PROG}-macos-x64.tar.gz
