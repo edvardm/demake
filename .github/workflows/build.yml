@@ -14,12 +14,12 @@ env:
 jobs:
   stack-build:
     name: stack ${{ matrix.stack }} / ghc ${{ matrix.ghc }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         stack: [2.9.1]
         ghc: [8.10.7]
-        # ghc: [8.10.7, 9.2.4]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         name: Cache ~/.stack
         with:
           path: ~/.stack
-          key: ${{ runner.os }}-ghc-${{ matrix.ghc }}-stack-${{ matrix.stack }}
+          key: ${{ runner.os }}-ca-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
 
       - uses: actions/cache@v3.0.9
         name: Cache .stack-work
@@ -48,68 +48,25 @@ jobs:
 
       - name: Install dependencies
         run: |
-          stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --arch x86_64 --only-dependencies
+          stack build --test --bench --no-run-tests --no-run-benchmarks --only-dependencies
 
       - name: Build
         run: |
-          stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --arch x86_64
+          stack build --test --bench --no-run-tests --no-run-benchmarks
 
       - name: Test
         run: |
-          stack test --system-ghc --test-arguments=--format=progress --arch x86_64
-
-  release:
-    needs: stack-build
-    name: release
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        include:
-          - os: ubuntu-latest
-            target: linux
-          - os: macos-latest
-            target: macos
-
-    steps:
-      - uses: haskell/actions/setup@v1
-        name: Setup Haskell Stack
-        with:
-          stack-version: 2.9.1
-          ghc-version: 8.10.7
-
-      - uses: actions/cache@v3.0.9
-        name: Cache ~/.stack
-        with:
-          path: ~/.stack
-          key: ${{ matrix.os }}-ghc-8.10.7-stack-2.9.1
-
-      - uses: actions/cache@v3.0.9
-        name: Cache .stack-work
-        with:
-          path: .stack-work
-          key: ${{ matrix.os }}-stack-work-${{ hashFiles('**.yaml') }}
-          restore-keys: |
-            ${{ matrix.os }}-stack-work
-
-      - name: Build
-        run: |
-          stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
-
-      - name: Install
-        run: |
-          stack install --no-run-tests --no-run-benchmarks --ghc-options=-O2
+          stack test --test-arguments=--format=progress
 
       - name: Prepare build artifact
         run: |
           rm -rf pkg && mkdir pkg/
-          cp ~/.local/bin/demake pkg/
-          strip pkg/demake
-          tar -cvf demake-${{ matrix.target }}.tar pkg/
+          cp "$(stack exec -- which demake)" pkg/
+          tar -cavf "demake-${{ matrix.os }}.tar" pkg/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: demake-${{ matrix.target }}
-          path: demake-${{ matrix.target }}.tar
+          name: demake-${{ matrix.os }}
+          path: demake-${{ matrix.os }}.tar
           if-no-files-found: error
