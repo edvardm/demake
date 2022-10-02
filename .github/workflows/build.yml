@@ -8,8 +8,11 @@ on:
     branches:
       - master
 
+env:
+  PROG: demake
+
 jobs:
-  stack:
+  stack-build:
     name: stack ${{ matrix.stack }} / ghc ${{ matrix.ghc }}
     runs-on: ubuntu-latest
     strategy:
@@ -44,3 +47,22 @@ jobs:
       - name: Test
         run: |
           stack test --system-ghc --test-arguments=--format=progress --arch x86_64
+
+  release:
+    runs-on: ubuntu-latest
+    name: stack release
+    steps:
+      - name: Prepare release
+        run: |
+          build_dir=$(stack path --dist-dir)/build/${PROG}
+
+          mkdir pkg && \
+            pushd ${PROG} && \
+            cp "$build_dir/${PROG}" ../pkg/ && \
+            popd
+
+      - name: Upload release
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${PROG}-${{ runner.os }}
+          path: pkg
