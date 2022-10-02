@@ -67,10 +67,11 @@ jobs:
           rm -rf pkg && mkdir pkg/
           cp ~/.local/bin/demake pkg/
           strip pkg/demake
-          tar cvf demake-x64.tar.gz pkg/
+          tar -cvf demake-x64.tar pkg/
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: demake-x64
-          path: demake-x64.tar.gz
+          path: demake-x64.tar
+          if-no-files-found: error
