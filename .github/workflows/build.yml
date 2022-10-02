@@ -13,13 +13,13 @@ env:
 
 jobs:
   stack-build:
-    name: stack ${{ matrix.stack }} / ghc ${{ matrix.ghc }}
+    name: ${{ matrix.os }} / ghc ${{ matrix.ghc }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         stack: [2.9.1]
         ghc: [8.10.7]
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest]
 
     steps:
       - uses: actions/checkout@v2
