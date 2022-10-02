@@ -1,4 +1,5 @@
 # BUILDOPTS := "--fast --haddock-deps"
+
 BUILDOPTS := "--fast"
 PROG := "demake"
 
@@ -19,7 +20,7 @@ hoogle: gen-local-hoogle
 
 # run for given file printing tasks.py to stdout
 run file:
-    @stack exec {{PROG}} -- {{ file }} -o-
+    @stack exec {{ PROG }} -- {{ file }} -o-
 
 # build all targets
 build:
@@ -27,7 +28,7 @@ build:
 
 # watch for changes, run for sample file when complete
 watch:
-    stack build {{ BUILDOPTS }} --no-run-tests --file-watch --exec "stack exec {{PROG}} -- -D test/01.mk"
+    stack build {{ BUILDOPTS }} --no-run-tests --file-watch --exec "stack exec {{ PROG }} -- -D test/01.mk"
 
 watch-test:
     stack build {{ BUILDOPTS }} --file-watch --test
@@ -61,7 +62,6 @@ todo:
 install:
     stack install
 
-
 markdown-filter:
     #!/usr/bin/env python
     import sys
@@ -79,5 +79,3 @@ update-examples:
 
 mk-readme: update-examples
     just markdown-filter < .readme.tmpl.md > README.md
-
-
