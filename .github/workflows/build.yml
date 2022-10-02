@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --only-dependencies --arch x86_64
+          stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --arch x86_64 --only-dependencies
 
       - name: Build
         run: |
