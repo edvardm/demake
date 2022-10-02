@@ -32,7 +32,7 @@ stack build && \
   echo "installed to $(stack path --local-bin)"
 ```
 
-If you don't have Stack setup already, I recommend using `https://www.haskell.org/ghcup/` to install it. 
+If you don't have Stack setup already, I recommend using `https://www.haskell.org/ghcup/` to install it.
 
 ## Sample run<a id="sample-run"></a>
 
@@ -90,11 +90,11 @@ def dev_init(c):
 
 Ideas only, haven't committed to anything yet
 
-- Homebrew recipe
-- Invent better name (names are hard)
-- Include target-specific comments as PyInvoke comments
-- [Justfile](https://github.com/casey/just) support
-- [Shake](https://github.com/casey/just) support
+-   Homebrew recipe
+-   Invent better name (names are hard)
+-   Include target-specific comments as PyInvoke comments
+-   [Justfile](https://github.com/casey/just) support
+-   [Shake](https://github.com/casey/just) support
 
 ## Credits
 
