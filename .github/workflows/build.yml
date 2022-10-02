@@ -58,6 +58,20 @@ jobs:
         run: |
           stack test --system-ghc --test-arguments=--format=progress --arch x86_64
 
+  release:
+    needs: stack-build
+    name: release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            target: linux
+          - os: macos-latest
+            target: macos
+
+    steps:
       - name: Install
         run: |
           stack install --no-run-tests --no-run-benchmarks
@@ -67,11 +81,11 @@ jobs:
           rm -rf pkg && mkdir pkg/
           cp ~/.local/bin/demake pkg/
           strip pkg/demake
-          tar -cvf demake-x64.tar pkg/
+          tar -cvf demake-${{ matrix.target }}.tar pkg/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: demake-x64
-          path: demake-x64.tar
+          name: demake-${{ matrix.target }}
+          path: demake-${{ matrix.target }}.tar
           if-no-files-found: error
