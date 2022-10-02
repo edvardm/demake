@@ -67,10 +67,10 @@ jobs:
           rm -rf pkg && mkdir pkg/
           cp ~/.local/bin/demake pkg/
           strip pkg/demake
-          tar cvf demake-macos-x64.tar.gz pkg/
+          tar cvf demake-x64.tar.gz pkg/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: demake-macos-x64
-          path: pkg/demake-macos-x64.tar.gz
+          name: demake-x64
+          path: demake-x64.tar.gz
