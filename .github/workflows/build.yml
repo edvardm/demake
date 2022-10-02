@@ -72,9 +72,33 @@ jobs:
             target: macos
 
     steps:
+      - uses: haskell/actions/setup@v1
+        name: Setup Haskell Stack
+        with:
+          stack-version: 2.9.1
+          ghc-version: 8.10.7
+
+      - uses: actions/cache@v3.0.9
+        name: Cache ~/.stack
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-ghc-8.10.7-stack-2.9.1
+
+      - uses: actions/cache@v3.0.9
+        name: Cache .stack-work
+        with:
+          path: .stack-work
+          key: ${{ matrix.os }}-stack-work-${{ hashFiles('**.yaml') }}
+          restore-keys: |
+            ${{ matrix.os }}-stack-work
+
+      - name: Build
+        run: |
+          stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --arch x86_64
+
       - name: Install
         run: |
-          stack install --no-run-tests --no-run-benchmarks
+          stack install --no-run-tests --no-run-benchmarks --ghc-options=-O2
 
       - name: Prepare build artifact
         run: |
