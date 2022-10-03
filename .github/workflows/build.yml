@@ -64,9 +64,15 @@ jobs:
         with:
           just-version: 0.10.2 # optional semver specification, otherwise latest
 
-      - name: Create Readme
-        run: just mk-readme
-
+      - name: "💫  Dynamic Template Render"
+        uses: varunsridharan/action-dynamic-readme@main
+        with:
+          # GLOBAL_TEMPLATE_REPOSITORY: {repository-owner}/{repository-name}
+          files: |
+            README.md
+          confirm_and_push: false # Important if use "Require a pull request before merging" rule
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # - name: Prepare build artifact
       #   run: |
       #     rm -rf pkg && mkdir pkg/
