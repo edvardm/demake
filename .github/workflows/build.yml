@@ -4,6 +4,11 @@ name: CI
 # Trigger the workflow on push or pull request, but only for the main branch
 on:
   pull_request:
+    paths:
+      - "**.hs"
+      - "stack.yaml*"
+      - package.yaml
+
   push:
     branches:
       - master
@@ -64,24 +69,3 @@ jobs:
         with:
           just-version: 0.10.2 # optional semver specification, otherwise latest
 
-      - name: "💫  Dynamic Template Render"
-        uses: varunsridharan/action-dynamic-readme@main
-        with:
-          # GLOBAL_TEMPLATE_REPOSITORY: {repository-owner}/{repository-name}
-          files: |
-            README.md
-          confirm_and_push: false # Important if use "Require a pull request before merging" rule
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # - name: Prepare build artifact
-      #   run: |
-      #     rm -rf pkg && mkdir pkg/
-      #     cp "$(stack exec -- which demake)" pkg/
-      #     tar -cavf "demake-${{ matrix.os }}.tar" pkg/
-
-      # - name: Upload artifact
-      #   uses: actions/upload-artifact@v3.1.0
-      #   with:
-      #     name: demake-${{ matrix.os }}
-      #     path: demake-${{ matrix.os }}.tar
-      #     if-no-files-found: error

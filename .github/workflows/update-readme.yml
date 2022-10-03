@@ -1,0 +1,34 @@
+---
+name: Update README.md
+
+# Trigger the workflow on push or pull request, but only for the main branch
+on:
+  pull_request:
+    paths:
+      - "README.md"
+      - "**/*.py"
+      - "**/*.mk"
+  push:
+    branches:
+      - master
+
+env:
+  PROG: demake
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: "💫  Dynamic Template Render"
+        uses: varunsridharan/action-dynamic-readme@main
+        with:
+          # GLOBAL_TEMPLATE_REPOSITORY: {repository-owner}/{repository-name}
+          files: |
+            README.md
+          confirm_and_push: false # Important if use "Require a pull request before merging" rule
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
