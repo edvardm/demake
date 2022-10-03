@@ -12,6 +12,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "**.hs"
+      - "stack.yaml*"
+      - package.yaml
 
 env:
   PROG: demake
