@@ -77,5 +77,5 @@ markdown-filter:
 update-examples:
     just run examples/02.mk > examples/02-tasks.py
 
-mk-readme: update-examples
+mk-readme:
     just markdown-filter < .readme.tmpl.md > README.md
