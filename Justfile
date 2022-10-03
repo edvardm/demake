@@ -37,6 +37,10 @@ watch-test:
 lint:
     hlint --git
 
+# run stack clean
+clean:
+    stack clean --full
+
 # run tests
 test:
     stack test --fast
@@ -56,7 +60,7 @@ bump kind="minor": fmt amend-if-changed
 
 # List TODOs
 todo:
-    bat .todo.md
+    nvim .todo.md
 
 # copy to ~/.local/bin/
 install:
