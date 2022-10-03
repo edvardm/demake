@@ -76,6 +76,7 @@ markdown-filter:
 
 update-examples:
     just run examples/02.mk > examples/02-tasks.py
+    git status examples/02-tasks.py || git commit -m "updatetd example 02"
 
-mk-readme: update-examples
-    just markdown-filter < .readme.tmpl.md > README.md
+update-readme:
+    just markdown-filter < readme.tmpl.md > README.md

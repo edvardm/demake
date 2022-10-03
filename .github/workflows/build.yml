@@ -4,6 +4,11 @@ name: CI
 # Trigger the workflow on push or pull request, but only for the main branch
 on:
   pull_request:
+    paths:
+      - "**.hs"
+      - "stack.yaml*"
+      - package.yaml
+
   push:
     branches:
       - master
@@ -19,7 +24,8 @@ jobs:
       matrix:
         stack: [2.9.1]
         ghc: [8.10.7]
-        os: [ubuntu-latest, macos-latest]
+        # os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -58,15 +64,7 @@ jobs:
         run: |
           stack test --test-arguments=--format=progress
 
-      - name: Prepare build artifact
-        run: |
-          rm -rf pkg && mkdir pkg/
-          cp "$(stack exec -- which demake)" pkg/
-          tar -cavf "demake-${{ matrix.os }}.tar" pkg/
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3.1.0
+      - uses: extractions/setup-just@v1
+        name: Install Just
         with:
-          name: demake-${{ matrix.os }}
-          path: demake-${{ matrix.os }}.tar
-          if-no-files-found: error
+          just-version: 0.10.2 # optional semver specification, otherwise latest
