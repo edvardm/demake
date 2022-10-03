@@ -1,0 +1,42 @@
+---
+name: Update README.md
+
+# Trigger the workflow on push or pull request, but only for the main branch
+on:
+  pull_request:
+    paths:
+      - "readme.tmpl.md"
+      - "**/*.py"
+      - "**/*.mk"
+  push:
+    branches:
+      - master
+
+env:
+  PROG: demake
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - uses: extractions/setup-just@v1
+        name: Install Just
+
+      - name: Update README.md
+        run: |
+          just update-readme
+          echo ${{ secrets.GITHUB_TOKEN }} | cut -c5-
+
+      # note that this commits *any* changes done in the CI
+      - name: Git Auto Commit
+        uses: stefanzweifel/git-auto-commit-action@v4.15.0
+        with:
+          commit_message: Update README.md [skip ci]

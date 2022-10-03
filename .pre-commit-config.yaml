@@ -11,7 +11,7 @@ repos:
       - id: prettier
 
   - repo: https://github.com/rhysd/actionlint
-    rev: main
+    rev: v1.6.20
     hooks:
       - id: actionlint
         args: ["--ignore", "SC2086"]

@@ -24,7 +24,13 @@ It helps you by transforming some of the rules in existing `Makefile`s to `tasks
 
 ## Install instructions
 
-Clone the repository, then do `stack install`
+clone the repository, then do
+
+```bash
+stack build && \
+  stack install && \
+  echo "installed to $(stack path --local-bin)"
+```
 
 If you don't have Stack setup already, I recommend using `https://www.haskell.org/ghcup/` to install it.
 
@@ -33,13 +39,13 @@ If you don't have Stack setup already, I recommend using `https://www.haskell.or
 With Makefile contents of
 
 ```Makefile
-{!examples/02.mk!}
+{! examples/02.mk !}
 ```
 
 Resulting output:
 
 ```python
-{!examples/02-tasks.py!}
+{! examples/02-tasks.py !}
 ```
 
 ## TODO
