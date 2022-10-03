@@ -60,4 +60,4 @@ Ideas only, haven't committed to anything yet
 
 ## Credits
 
-Nicolas Mattia's [Makefile library](https://github.com/nmattia/makefile), which I modified a bit to support parsing of top-level and inline comments
+Nicolas Mattias for his [Makefile library](https://github.com/nmattia/makefile), which I modified a bit to support parsing of top-level and inline comments
