@@ -39,8 +39,8 @@ If you don't have Stack setup already, I recommend using `https://www.haskell.or
 With Makefile contents of
 
 ```Makefile
-<!-- START include {examples/02.mk} -->
-<!-- END include {examples/02.mk} -->
+<!-- START test/02.mk -->
+<!-- END test/02.mk -->
 ```
 
 Resulting output:
