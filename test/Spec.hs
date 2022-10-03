@@ -10,7 +10,17 @@ import Test.Hspec
 firstTask :: Makefile -> PyEntry
 firstTask = head . toPyEntries
 
+textToMake :: [T.Text] -> Either String Makefile
 textToMake = parseMakefileContents . T.unlines
+
+taskNames :: [PyEntry] -> [TaskName]
+taskNames = map f
+ where
+  f (PyTask t) = name t
+  f _ = error "internal logic error, should be used with tasks only"
+
+makeRulesToTasknames :: Makefile -> [TaskName]
+makeRulesToTasknames = taskNames . toPyEntries
 
 main :: IO ()
 main = hspec $ do
@@ -172,18 +182,14 @@ main = hspec $ do
           ]
 
     it "adds multiple dependencies as pre-tasks" $ do
-      map
-        (\(PyTask t) -> name t)
-        ( toPyEntries
-            ( Makefile
-                { entries =
-                    [ Rule (Target "a") [] []
-                    , Rule (Target "b") [] []
-                    , Rule (Target "dev_init") [Dependency "a", Dependency "b"] []
-                    ]
-                }
-            )
-        )
+      makeRulesToTasknames
+        Makefile
+          { entries =
+              [ Rule (Target "a") [] []
+              , Rule (Target "b") [] []
+              , Rule (Target "dev_init") [Dependency "a", Dependency "b"] []
+              ]
+          }
         `shouldBe` ["a", "b", "dev_init"]
 
     it "can sort tasks topologically by dependencies" $ do
