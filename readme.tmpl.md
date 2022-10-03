@@ -10,9 +10,7 @@ Helper to convert Makefiles to [PyInvoke](https://www.pyinvoke.org/) files, see 
 
 Makefiles typically contain rules to build files based on dependencies, whereas [PyInvoke](https://www.pyinvoke.org/) is used for task automation. These are two separate things.
 
-[GNU Make](https://www.gnu.org/software/make/) is a powerful tool, so it is often used for task automation as well, mainly because it is already present in many development environments, and most people are familiar with the basic syntax.
-
-Problem is, Make is not very suitable for complex rules. Error handling, condition logic, passing arbitrary command line arguments etc is not where it really shines.
+[GNU Make](https://www.gnu.org/software/make/) is a powerful tool, so it is often used for task automation as well, mainly because it is already present in many development environments, and most people are familiar with the basic syntax. Problem is, Make is not very suitable for complex rules. Error handling, condition logic, passing arbitrary command line arguments etc is not where it really shines.
 
 In the end there shouldn't even be battle between Make and task automation tools. In fact, in some cases it makes totally sense to have both PyInvoke for convenient task automation, and Make for incremental builds. PyInvoke, like many task automation tools, doesn't offer support for building items automatically based on extension, or running build targets based on file modification time. In such cases, it would be totally reasonable to use PyInvoke as main automation tool for developers, and let Make handle incremental builds and nothing else.
 
@@ -47,16 +45,6 @@ Resulting output:
 ```python
 {! examples/02-tasks.py !}
 ```
-
-## TODO
-
-Ideas only, haven't committed to anything yet
-
--   Homebrew recipe
--   Invent better name (names are hard)
--   Include target-specific comments as PyInvoke comments
--   [Justfile](https://github.com/casey/just) support
--   [Shake](https://github.com/casey/just) support
 
 ## Credits
 
