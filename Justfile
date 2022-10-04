@@ -8,11 +8,20 @@ gen-local-hoogle:
     stack hoogle -- generate --local
 
 dev-deps:
-    # LTS might not contain things we need
-    cabal install ghcide hindent ghcid
+    # LTS might not contain things we need. Yet this could produce incompatible
+    # binaries -- use stack instead with manual overrides?
+    just require-cmd ghcide
+    just require-cmd hindent
+    just require-cmd ghcid
 
 # prepare project ready for development
-dev-init: dev-deps build
+dev-init: check-ghcup dev-deps build
+
+check-ghcup:
+    command -v ghcup > /dev/null || echo "ghcup not found, recommend installing it: https://www.haskell.org/ghcup/install/"
+
+require-cmd cmd:
+    @command -v {{cmd}} > /dev/null || ("echo {{cmd}} not found, installing"; cabal v2-install {{cmd}})
 
 # start local hoogle server
 hoogle: gen-local-hoogle
