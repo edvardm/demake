@@ -46,10 +46,9 @@ test:
     stack test --fast
 
 # format code
-fmt: fmt-f
-
-fmt-f:
+fmt:
     fourmolu --indentation 2 --mode inplace src/**/*.hs app/*.hs test/*.hs
+    just --fmt --unstable  # format self
 
 amend-if-changed:
     git status || git --amend --no-edit commit .
