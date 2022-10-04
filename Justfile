@@ -1,6 +1,6 @@
 BUILDOPTS := "-j4 --pedantic"
 PROG := "demake"
-VERSION := "0.1.1"
+VERSION := "0.1.2"
 RELEASE_DIR := "demake-" + VERSION
 
 # generate local hoogle index

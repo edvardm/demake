@@ -24,14 +24,12 @@ import           System.Posix.Escape (escape)
 import qualified Text.RE.PCRE as RE
 import           Text.RE.Replace as REPL
 
-type Code = T.Text
-
 fromCode :: T.Text -> Builder
 fromCode = fromText
 
-type VarName = T.Text
+type VarName = Text
 
-type TaskName = T.Text
+type TaskName = Text
 
 type InvFile = [PyEntry]
 
@@ -40,10 +38,10 @@ type AdjTuple = (Task, TaskName, [TaskName])
 newtype InvFun = InvFun TaskName
     deriving (Show, Eq)
 
-newtype InvCmd = InvCmd Code
+newtype InvCmd = InvCmd Text
     deriving (Show, Eq)
 
-newtype InvDep = InvDep Code
+newtype InvDep = InvDep Text
     deriving (Show, Eq)
 
 data InvParam = Bool VarName | Str VarName
@@ -63,7 +61,7 @@ data Task = Task
     }
     deriving (Show, Eq)
 
-data Const = Const VarName Code
+data Const = Const VarName Text
     deriving (Show, Eq)
 
 defTask :: Task
@@ -81,7 +79,7 @@ toPyEntries Makefile{entries = es} = assigns ++ catMaybes tasksM
     injectOpts t@Task{name} = t{parameters = params}
       where
         params = map (Str . snd) $ catMaybes [Map.lookup name taskOpts]
-        taskOpts :: Map.Map Text (VarName, T.Text)
+        taskOpts :: Map.Map Text (VarName, Text)
         taskOpts = Map.fromList $ mapMaybe f es
           where
             f (RuleRef (Target t') ConditionalAssign key val) = Just (t', (key, val))
@@ -207,7 +205,7 @@ bld = foldr1 (<>) . map fromText
 imports :: Builder
 imports = fromText "from invoke import task" <> nl
 
-pyTranslate :: Code -> Code
+pyTranslate :: Text -> Text
 pyTranslate = foldr1 (.) $ map (`T.replace` "_") [".", "-"]
 
 nl :: Builder
@@ -219,7 +217,7 @@ funSep = nl <> nl
 mjoin :: Monoid a => a -> [a] -> a
 mjoin s = foldr1 (\a acc -> a <> s <> acc)
 
-depName :: InvDep -> Code
+depName :: InvDep -> Text
 depName (InvDep c) = c
 
 -- Topologically sort graph. Note: returns empty list in case of acyclic graph
