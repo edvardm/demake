@@ -4,7 +4,7 @@ name: Release
 on:
   push:
     branches:
-      - "*"
+      - "master"
 
 jobs:
   publish:
@@ -21,9 +21,9 @@ jobs:
             asset_name: demake-macos-x86_64_osx
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - uses: haskell/actions/setup@v1
         name: Setup Haskell Stack
@@ -48,9 +48,7 @@ jobs:
       - name: Build
         run: |
           stack build --ghc-options -O2
-          stack install
-          mkdir -p ${{ matrix.asset_name }}
-          cp ~/.local/bin/demake ./demake
+          stack install --local-bin-path ./
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
