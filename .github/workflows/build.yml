@@ -62,7 +62,7 @@ jobs:
 
       - name: Build
         run: |
-          stack build --test --bench --no-run-tests --no-run-benchmarks
+          stack build --test --bench
 
       - name: Test
         run: |
