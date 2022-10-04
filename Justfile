@@ -1,7 +1,5 @@
 BUILDOPTS := "-j4 --fast --pedantic"
 PROG := "demake"
-VERSION := "0.1.2"
-RELEASE_DIR := "demake-" + VERSION
 
 # generate local hoogle index
 gen-local-hoogle:
@@ -93,12 +91,3 @@ update-examples:
 
 update-readme:
     just include-file-flt < readme.tmpl.md > README.md
-
-package-bin: bin-install
-    mkdir -p {{ RELEASE_DIR }}
-    cp ~/.local/bin/demake {{ RELEASE_DIR }}
-    shasum {{ RELEASE_DIR }}/demake > {{ RELEASE_DIR }}/shasum.txt
-    tar -Jcvf demake-{{ VERSION }}.tar.xz {{ RELEASE_DIR }}/
-
-bin-install:
-    stack build {{ BUILDOPTS }} --ghc-options -O2 && stack install
