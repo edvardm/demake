@@ -1,6 +1,6 @@
 # BUILDOPTS := "--fast --haddock-deps"
 
-BUILDOPTS := "--fast"
+BUILDOPTS := "-j4 --fast --pedantic"
 PROG := "demake"
 
 # generate local hoogle index
