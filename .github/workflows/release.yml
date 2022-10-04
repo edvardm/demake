@@ -2,19 +2,8 @@
 name: Release
 
 on:
-  pull_request:
-    paths:
-      - "**.hs"
-      - "stack.yaml*"
-      - package.yaml
   push:
     branches:
-      - master
-    paths:
-      - "**.hs"
-      - "stack.yaml*"
-      - package.yaml
-    tags:
       - "*"
 
 jobs:
