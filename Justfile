@@ -1,4 +1,4 @@
-BUILDOPTS := "-j4 --pedantic"
+BUILDOPTS := "-j4 --fast --pedantic"
 PROG := "demake"
 VERSION := "0.1.2"
 RELEASE_DIR := "demake-" + VERSION
