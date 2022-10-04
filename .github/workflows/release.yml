@@ -5,6 +5,9 @@ on:
   push:
     tags:
       - "*"
+  label:
+    types: [created]
+    if: ${{ github.event.label.name == 'release' }}
 
 jobs:
   publish:
