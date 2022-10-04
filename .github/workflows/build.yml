@@ -8,14 +8,14 @@ on:
       - "**.hs"
       - "stack.yaml*"
       - package.yaml
-
-  push:
-    branches:
-      - master
-    paths:
-      - "**.hs"
-      - "stack.yaml*"
-      - package.yaml
+      - .github/workflows/build.yml
+  # push:
+  #   branches:
+  #     - master
+  #   paths:
+  #     - "**.hs"
+  #     - "stack.yaml*"
+  #     - package.yaml
 
 env:
   PROG: demake
@@ -32,7 +32,7 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
 
@@ -62,7 +62,7 @@ jobs:
 
       - name: Build
         run: |
-          stack build --test --bench --no-run-tests --no-run-benchmarks
+          stack build --test --bench
 
       - name: Test
         run: |
