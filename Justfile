@@ -1,18 +1,25 @@
-BUILDOPTS := "-j4 --pedantic"
+BUILDOPTS := "-j4 --fast --pedantic"
 PROG := "demake"
-VERSION := "0.1.2"
-RELEASE_DIR := "demake-" + VERSION
 
 # generate local hoogle index
 gen-local-hoogle:
     stack hoogle -- generate --local
 
 dev-deps:
-    # LTS might not contain things we need
-    cabal install ghcide hindent ghcid
+    # LTS might not contain things we need. Yet this could produce incompatible
+    # binaries -- use stack instead with manual overrides?
+    just require-cmd ghcide
+    just require-cmd hindent
+    just require-cmd ghcid
 
 # prepare project ready for development
-dev-init: dev-deps build
+dev-init: check-ghcup dev-deps build
+
+check-ghcup:
+    command -v ghcup > /dev/null || echo "ghcup not found, recommend installing it: https://www.haskell.org/ghcup/install/"
+
+require-cmd cmd:
+    @command -v {{cmd}} > /dev/null || ("echo {{cmd}} not found, installing"; cabal v2-install {{cmd}})
 
 # start local hoogle server
 hoogle: gen-local-hoogle
@@ -84,12 +91,3 @@ update-examples:
 
 update-readme:
     just include-file-flt < readme.tmpl.md > README.md
-
-package-bin: bin-install
-    mkdir -p {{ RELEASE_DIR }}
-    cp ~/.local/bin/demake {{ RELEASE_DIR }}
-    shasum {{ RELEASE_DIR }}/demake > {{ RELEASE_DIR }}/shasum.txt
-    tar -Jcvf demake-{{ VERSION }}.tar.xz {{ RELEASE_DIR }}/
-
-bin-install:
-    stack build {{ BUILDOPTS }} --ghc-options -O2 && stack install
