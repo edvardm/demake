@@ -7,10 +7,10 @@ on:
       - "*"
   label:
     types: [created]
-    if: ${{ github.event.label.name == 'release' }}
 
 jobs:
   publish:
+    if: ${{ github.event.label.name == 'release' }}
     name: Build release /w ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
