@@ -30,7 +30,7 @@ stack build && \
   echo "installed to $(stack path --local-bin)"
 ```
 
-If you don't have Stack setup already, I recommend using `https://www.haskell.org/ghcup/` to install it.
+If you don't have Stack setup already, I recommend using [ghcup](https://www.haskell.org/ghcup/) to install it.
 
 ## Sample run<a id="sample-run"></a>
 
