@@ -2,15 +2,23 @@
 name: Release
 
 on:
+  pull_request:
+    paths:
+      - "**.hs"
+      - "stack.yaml*"
+      - package.yaml
   push:
+    branches:
+      - master
+    paths:
+      - "**.hs"
+      - "stack.yaml*"
+      - package.yaml
     tags:
       - "*"
-  label:
-    types: [created]
 
 jobs:
   publish:
-    if: ${{ github.event.label.name == 'release' }}
     name: Build release /w ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:

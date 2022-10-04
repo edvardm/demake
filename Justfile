@@ -1,7 +1,7 @@
-# BUILDOPTS := "--fast --haddock-deps"
-
-BUILDOPTS := "-j4 --fast --pedantic"
+BUILDOPTS := "-j4 --pedantic"
 PROG := "demake"
+VERSION := "0.1.0"
+RELEASE_DIR := "demake-" + VERSION
 
 # generate local hoogle index
 gen-local-hoogle:
@@ -28,13 +28,13 @@ build:
 
 # watch for changes, run for sample file when complete
 watch:
-    stack build {{ BUILDOPTS }} --no-run-tests --file-watch --exec "stack exec {{ PROG }} -- -D test/01.mk"
+    stack build {{ BUILDOPTS }} --fast --no-run-tests --file-watch --exec "stack exec {{ PROG }} -- -D test/01.mk"
 
 watch-test:
-    stack build {{ BUILDOPTS }} --file-watch --test
+    stack build {{ BUILDOPTS }} --fast --file-watch --test
 
 # lint all files
-lint:
+lint: fmt
     hlint --git
 
 # run stack clean
@@ -65,7 +65,8 @@ todo:
 install:
     stack install
 
-markdown-filter:
+# Substitute {! file/path !} with contents of that file
+include-file-flt:
     #!/usr/bin/env python
     import sys
     import re
@@ -82,4 +83,13 @@ update-examples:
     git status examples/02-tasks.py || git commit -m "updatetd example 02"
 
 update-readme:
-    just markdown-filter < readme.tmpl.md > README.md
+    just include-file-flt < readme.tmpl.md > README.md
+
+package-bin: bin-install
+    mkdir -p {{ RELEASE_DIR }}
+    cp ~/.local/bin/demake {{ RELEASE_DIR }}
+    shasum {{ RELEASE_DIR }}/demake > {{ RELEASE_DIR }}/shasum.txt
+    tar -Jcvf demake-{{ VERSION }}.tar.xz {{ RELEASE_DIR }}/
+
+bin-install:
+    stack build {{ BUILDOPTS }} --ghc-options -O2 && stack install
