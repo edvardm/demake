@@ -8,7 +8,7 @@ on:
 
 jobs:
   publish:
-    name: Build release /w ${{ matrix.os }}
+    name: Release binaries
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -51,6 +51,14 @@ jobs:
           mkdir -p ${{ matrix.asset_name }}
           stack install --local-bin-path ${{ matrix.asset_name }}/
           tar -Jcvf ${{ matrix.asset_name }}.tar.xz ${{ matrix.asset_name }}/
+
+      - name: Wait for all other workflows to succeed
+        uses: lewagon/wait-on-check-action@v1.1.2
+        with:
+          ref: ${{ github.ref }}
+          running-workflow-name: "Release binaries"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 16
 
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
