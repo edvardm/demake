@@ -19,7 +19,7 @@ check-ghcup:
     command -v ghcup > /dev/null || echo "ghcup not found, recommend installing it: https://www.haskell.org/ghcup/install/"
 
 require-cmd cmd:
-    @command -v {{cmd}} > /dev/null || ("echo {{cmd}} not found, installing"; cabal v2-install {{cmd}})
+    @command -v {{ cmd }} > /dev/null || ("echo {{ cmd }} not found, installing"; cabal v2-install {{ cmd }})
 
 # start local hoogle server
 hoogle: gen-local-hoogle
@@ -50,7 +50,7 @@ clean:
 
 # run tests
 test:
-    stack test --fast
+    ghcid -c="stack ghci test/Spec.hs" -T="main" --warnings $@
 
 # format code
 fmt:
