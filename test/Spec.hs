@@ -57,9 +57,8 @@ main = hspec $ do
       `shouldBe` Right Makefile{entries = [Include "foo" (Just $ LineComment "a comment")]}
 
   describe "Makefile to Pyinvoke" $ do
-    -- TODO: create helper fun for toPyEntries Makefile entries...
     it "skips .PHONY declarations" $ do
-      toPyEntries
+      makeRulesToTasknames
         ( Makefile
             { entries = [Rule (Target ".PHONY") [Dependency "clean"] []]
             }
