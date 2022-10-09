@@ -51,10 +51,18 @@ main = hspec $ do
         ]
         `shouldBe` Right Makefile{entries = [Conditional]}
 
-  it "parses comments" $ do
-    textToMake
-      ["include foo  # a comment"]
-      `shouldBe` Right Makefile{entries = [Include "foo" (Just $ LineComment "a comment")]}
+    it "parses comments" $ do
+      textToMake
+        ["include foo  # a comment"]
+        `shouldBe` Right Makefile{entries = [Include "foo" (Just $ LineComment "a comment")]}
+
+      textToMake
+        ["foo: # target comment"]
+        `shouldBe` Right Makefile{entries = [RuleWithComment (Target "foo") [] (LineComment "target comment") []]}
+
+      textToMake
+        ["foo: ## handles double-hash"]
+        `shouldBe` Right Makefile{entries = [RuleWithComment (Target "foo") [] (LineComment "handles double-hash") []]}
 
   describe "Makefile to Pyinvoke" $ do
     it "skips .PHONY declarations" $ do
@@ -75,7 +83,7 @@ main = hspec $ do
         (Makefile{entries = [Rule (Target "ifneq ..") [] [Command "a"]]})
         `shouldBe` []
 
-    it "parses global assignments" $ do
+    it "transforms global assignments" $ do
       toPyEntries
         ( Makefile
             { entries =
@@ -92,48 +100,6 @@ main = hspec $ do
                         , commands = [InvCmd "rm -rf $(BIN)"]
                         }
                    ]
-
-    it "uses f-string interpolation for constants" $ do
-      asString
-        ( Makefile
-            { entries =
-                [ Assignment SimpleAssign "BIN" "myfile"
-                , OtherLine ""
-                , Rule (Target "clean") [] [Command "rm -rf $(BIN)"]
-                ]
-            }
-        )
-        `shouldBe` unlines
-          [ "from invoke import task"
-          , ""
-          , "BIN = \"myfile\""
-          , ""
-          , "@task"
-          , "def clean(c):"
-          , "    c.run(f'rm -rf {BIN}')"
-          ]
-
-    it "replaces all vars in a string" $ do
-      asString
-        ( Makefile
-            { entries =
-                [ Assignment SimpleAssign "BIN" "myfile"
-                , OtherLine ""
-                , Assignment SimpleAssign "target" "progname"
-                , Rule (Target "clean") [] [Command "rm -rf $(BIN) $(target)"]
-                ]
-            }
-        )
-        `shouldBe` unlines
-          [ "from invoke import task"
-          , ""
-          , "BIN = \"myfile\""
-          , "target = \"progname\""
-          , ""
-          , "@task"
-          , "def clean(c):"
-          , "    c.run(f'rm -rf {BIN} {target}')"
-          ]
 
     -- FIXME: opts should be split to different types, not just simple string
     it "parses per-rule assignments" $
@@ -157,7 +123,7 @@ main = hspec $ do
                         , commands = [InvCmd "cmd $(opts)"]
                         }
                    ]
-    it "converts rules without dependencies" $ do
+    it "transforms rules without dependencies" $ do
       firstTask
         (Makefile{entries = [Rule (Target "clean") [] [Command "rm"]]})
         `shouldBe` PyTask defTask{name = "clean", commands = [InvCmd "rm"]}
@@ -203,7 +169,7 @@ main = hspec $ do
         )
         `shouldBe` ["a", "d", "b", "c"]
 
-    it "filters out dependencies if couldn't work out how to create" $
+    it "filters out unknown dependencies" $
       do
         toPyEntries
           ( Makefile
@@ -227,46 +193,88 @@ main = hspec $ do
                       )
                    ]
 
-  describe "Tasks" $ do
-    it "converts dashes to underscores" $ do
-      asString (PyTask defTask{name = "a-name"})
-        `shouldBe` "@task\ndef a_name(c):\n    pass"
+  describe "Encoding" $ do
+    describe "Tasks" $ do
+      it "converts dashes to underscores" $ do
+        asString (PyTask defTask{name = "a-name"})
+          `shouldBe` "@task\ndef a_name(c):\n    pass"
 
-    it "sets 'pass' as function body for empty tasks" $ do
-      asString defTask{name = "fun"}
-        `shouldBe` "@task\ndef fun(c):\n    pass"
+      it "sets 'pass' as function body for empty tasks" $ do
+        asString defTask{name = "fun"}
+          `shouldBe` "@task\ndef fun(c):\n    pass"
 
-    it "replaces dot in task names and deps with underscore" $ do
-      asString (defTask{name = ".hidden"})
-        `shouldBe` "@task\ndef _hidden(c):\n    pass"
+      it "replaces dot in task names and deps with underscore" $ do
+        asString (defTask{name = ".hidden"})
+          `shouldBe` "@task\ndef _hidden(c):\n    pass"
 
-      asString (defTask{name = "foo.o", dependencies = [InvDep "foo.c"]})
-        `shouldBe` "@task(pre=[foo_c])\ndef foo_o(c):\n    pass"
+        asString (defTask{name = "foo.o", dependencies = [InvDep "foo.c"]})
+          `shouldBe` "@task(pre=[foo_c])\ndef foo_o(c):\n    pass"
 
-  describe "Dependencies" $ do
-    it "adds single depenency to pre list" $ do
-      asString [InvDep "dep"] `shouldBe` "@task(pre=[dep])"
+    describe "Dependencies" $ do
+      it "adds single depenency to pre list" $ do
+        asString [InvDep "dep"] `shouldBe` "@task(pre=[dep])"
 
-    it "converts dashes to underscores" $ do
-      asString [InvDep "dev-init"] `shouldBe` "@task(pre=[dev_init])"
+      it "converts dashes to underscores" $ do
+        asString [InvDep "dev-init"] `shouldBe` "@task(pre=[dev_init])"
 
-    it "joins multiple deps by comma" $ do
-      asString [InvDep "a", InvDep "b"] `shouldBe` "@task(pre=[a, b])"
+      it "joins multiple deps by comma" $ do
+        asString [InvDep "a", InvDep "b"] `shouldBe` "@task(pre=[a, b])"
 
-  describe "Commands" $ do
-    it "wraps command in quotes" $ do
-      asString (InvCmd "ls -l") `shouldBe` "    c.run('ls -l')\n"
+    describe "Commands" $ do
+      it "wraps command in quotes" $ do
+        asString (InvCmd "ls -l") `shouldBe` "    c.run('ls -l')\n"
 
-    it "double-escapes escaped quotes in commands" $ do
-      asString (InvCmd "ls \"fname\"") `shouldBe` "    c.run('ls \"fname\"')\n"
+      it "double-escapes escaped quotes in commands" $ do
+        asString (InvCmd "ls \"fname\"") `shouldBe` "    c.run('ls \"fname\"')\n"
 
-  describe "Comments" $ do
-    it "renders comments" $ do
-      pending
+    describe "Comments" $ do
+      it "renders comments" $ do
+        pending
 
-  describe "Includes" $ do
-    it "skips includes (convert those separately for now)" $ do
-      entryToTaskM (Include "foo" Nothing) `shouldBe` Nothing
-      entryToTaskM (Include "foo" lcom) `shouldBe` Nothing
- where
-  lcom = Just $ LineComment "asdf"
+    describe "Includes" $ do
+      it "skips includes (convert those separately for now)" $ do
+        entryToTaskM (Include "foo" Nothing) `shouldBe` Nothing
+        entryToTaskM (Include "foo" (Just $ LineComment "asdf")) `shouldBe` Nothing
+
+    describe "Makefile" $ do
+      it "uses f-string interpolation for constants" $ do
+        asString
+          ( Makefile
+              { entries =
+                  [ Assignment SimpleAssign "BIN" "myfile"
+                  , OtherLine ""
+                  , Rule (Target "clean") [] [Command "rm -rf $(BIN)"]
+                  ]
+              }
+          )
+          `shouldBe` unlines
+            [ "from invoke import task"
+            , ""
+            , "BIN = \"myfile\""
+            , ""
+            , "@task"
+            , "def clean(c):"
+            , "    c.run(f'rm -rf {BIN}')"
+            ]
+
+      it "replaces all vars in a string" $ do
+        asString
+          ( Makefile
+              { entries =
+                  [ Assignment SimpleAssign "BIN" "myfile"
+                  , OtherLine ""
+                  , Assignment SimpleAssign "target" "progname"
+                  , Rule (Target "clean") [] [Command "rm -rf $(BIN) $(target)"]
+                  ]
+              }
+          )
+          `shouldBe` unlines
+            [ "from invoke import task"
+            , ""
+            , "BIN = \"myfile\""
+            , "target = \"progname\""
+            , ""
+            , "@task"
+            , "def clean(c):"
+            , "    c.run(f'rm -rf {BIN} {target}')"
+            ]
