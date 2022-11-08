@@ -1,28 +1,27 @@
-{-# LANGUAGE FlexibleContexts  #-}
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE LambdaCase        #-}
-{-# LANGUAGE NamedFieldPuns    #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE RecordWildCards #-}
 
 module PyEncode where
 
--- import           Graph                  (Error, mkGraph, tsort, Graph (Graph))
+import Data.Graph (Graph, Vertex)
 import qualified Data.Graph as G
-import           Data.Graph (Graph, Vertex)
-import           Data.List (partition)
-import           Data.Makefile
+import Data.List (partition)
+import Data.Makefile
 import qualified Data.Map.Strict as Map
-import           Data.Maybe
+import Data.Maybe
 import qualified Data.Set
-import           Data.String (IsString)
+import Data.String (IsString)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as L
-import           Data.Text.Lazy.Builder
-import           System.Posix.Escape (escape)
+import Data.Text.Lazy.Builder
+import System.Posix.Escape (escape)
 import qualified Text.RE.PCRE as RE
-import           Text.RE.Replace as REPL
+import Text.RE.Replace as REPL
 
 fromCode :: T.Text -> Builder
 fromCode = fromText
@@ -65,8 +64,7 @@ data Const = Const VarName Text
     deriving (Show, Eq)
 
 defTask :: Task
-defTask =
-    Task{name = "mytask", dependencies = [], commands = [], parameters = []}
+defTask = Task{name = "mytask", dependencies = [], commands = [], parameters = []}
 
 toPyEntries :: Makefile -> [PyEntry]
 toPyEntries Makefile{entries = es} = assigns ++ catMaybes tasksM
@@ -94,8 +92,7 @@ toPyEntries Makefile{entries = es} = assigns ++ catMaybes tasksM
 
     trimDepsM (PyConst _) = Nothing
     trimDepsM (PyTask t@(Task{dependencies})) =
-        Just $
-            PyTask t{dependencies = deps'}
+        Just $ PyTask t{dependencies = deps'}
       where
         deps' = map InvDep $ filter (`elem` taskNames) $ map depName dependencies
         taskNames = Data.Set.fromList $ mapMaybe nameOf allTasks
@@ -148,11 +145,9 @@ instance Encodable TaskName where
 
 instance Encodable InvCmd where
     encode (InvCmd cmd)
-        -- | "ifeq", "ifneq"
         | "ifeq" `T.isPrefixOf` cmd = mempty
         | "ifneq" `T.isPrefixOf` cmd = mempty
-        | "#" `T.isPrefixOf` cmd =
-            indent <> fromText cmd <> nl
+        | "#" `T.isPrefixOf` cmd = indent <> fromText cmd <> nl
         | otherwise =
             indent
                 <> fromText "c.run("
@@ -161,9 +156,7 @@ instance Encodable InvCmd where
                 <> nl
       where
         formatCmd = fStringFmt . (escape . T.unpack) . rmNlsTabs
-
         rmNlsTabs = T.replace "\t" "" . T.replace "\\\n" " "
-
         fStringFmt src =
             let re = [RE.re|\$\($(.*?)\)|]
                 subst =
@@ -229,5 +222,4 @@ topoSort tasks = reverse topoSorted
     fst3 (x, _, _) = x
 
 mkGraph :: [Task] -> (Graph, Vertex -> AdjTuple, TaskName -> Maybe Vertex)
-mkGraph =
-    G.graphFromEdges . map (\t -> (t, name t, map depName $ dependencies t))
+mkGraph = G.graphFromEdges . map (\t -> (t, name t, map depName $ dependencies t))
