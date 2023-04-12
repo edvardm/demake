@@ -1,6 +1,6 @@
 # Demake
 
-Version 0.1.2
+Version 0.1.3
 
 ## Overview
 
@@ -68,7 +68,7 @@ dev-init: .check-poetry deps quick-test ## prepare project ready for development
 
 .PHONY: .check-poetry
 .check-poetry:
-	command -v poetry 2>/dev/null || (echo "poetry not found, please see https://python-poetry.org/docs/#installation"; exit 1)
+	@command -v poetry 2>/dev/null || (echo "poetry not found, please see https://python-poetry.org/docs/#installation"; exit 1)
 
 .PHONY: deps
 deps:  ## install dependencies

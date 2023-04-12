@@ -86,8 +86,8 @@ include-file-flt:
         sys.stdout.write(entry)
 
 update-examples:
-    just run examples/02.mk > examples/02-tasks.py
-    git status examples/02-tasks.py || git commit -m "updatetd example 02"
+    just run test/02.mk > examples/02-tasks.py
+    git status examples/02-tasks.py || git commit -m "update 02-tasks.py"
 
 update-readme:
     just include-file-flt < readme.tmpl.md > README.md

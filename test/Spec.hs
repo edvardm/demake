@@ -261,6 +261,9 @@ main = hspec $ do
     it "double-escapes escaped quotes in commands" $ do
       asString (InvCmd "ls \"fname\"") `shouldBe` "    c.run('ls \"fname\"')\n"
 
+    it "ignores preceding at-char in commands" $ do
+      asString (InvCmd "@touch $!") `shouldBe` "    c.run('touch $!')\n"
+
   describe "Comments" $ do
     it "renders comments" $ do
       pending

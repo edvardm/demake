@@ -1,6 +1,6 @@
 # Demake
 
-Version 0.1.2
+Version 0.1.3
 
 ## Overview
 
@@ -60,7 +60,7 @@ If you don't have Stack setup already, I recommend using
 With Makefile contents of
 
 ```Makefile
-{! examples/02.mk !}
+{! test/02.mk !}
 ```
 
 Resulting output:

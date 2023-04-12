@@ -155,8 +155,9 @@ instance Encodable InvCmd where
                 <> fromText ")"
                 <> nl
       where
-        formatCmd = fStringFmt . (escape . T.unpack) . rmNlsTabs
+        formatCmd = fStringFmt . (escape . T.unpack) . stripAtChar . rmNlsTabs
         rmNlsTabs = T.replace "\t" "" . T.replace "\\\n" " "
+        stripAtChar = T.dropWhile (== '@')
         fStringFmt src =
             let re = [RE.re|\$\($(.*?)\)|]
                 subst =
