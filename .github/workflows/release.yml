@@ -7,8 +7,8 @@ on:
       - "*"
 
 jobs:
-  publish:
-    name: Release binaries
+  build-release:
+    name: Build release binaries
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -52,14 +52,21 @@ jobs:
           stack install --local-bin-path ${{ matrix.asset_name }}/
           tar -Jcvf ${{ matrix.asset_name }}.tar.xz ${{ matrix.asset_name }}/
 
-      - name: Wait for all other workflows to succeed
-        uses: lewagon/wait-on-check-action@v1.1.2
-        with:
-          ref: ${{ github.ref }}
-          running-workflow-name: "Release binaries"
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          wait-interval: 16
+  publish:
+    name: Publish binaries
+    needs: build-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: demake
+            asset_name: demake-linux-x86_64
+          - os: macos-latest
+            artifact_name: demake
+            asset_name: demake-macos-x86_64_osx
 
+    steps:
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
