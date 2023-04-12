@@ -87,7 +87,7 @@ include-file-flt:
 
 update-examples:
     just run test/02.mk > examples/02-tasks.py
-    git status examples/02-tasks.py || git commit -v
+    git status examples/02-tasks.py || git commit -m "update 02-tasks.py"
 
-update-readme: update-examples
+update-readme:
     just include-file-flt < readme.tmpl.md > README.md
