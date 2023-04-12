@@ -22,29 +22,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: freckle/stack-action@v4
         with:
-          fetch-depth: 1
-
-      - uses: haskell/actions/setup@v2
-        name: Setup Haskell Stack
-        with:
-          ghc-version: "8.10.7"
-          stack-version: "2.9.1"
-
-      - uses: actions/cache@v3.0.9
-        name: Cache ~/.stack
-        with:
-          path: ~/.stack
-          key: ${{ runner.os }}-ca-${{ env.cache-name }}-${{ hashFiles('**/stack.yaml.lock') }}
-
-      - uses: actions/cache@v3.0.9
-        name: Cache .stack-work
-        with:
-          path: .stack-work
-          key: ${{ runner.os }}-stack-work-${{ hashFiles('**.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-stack-work
-
+          fast: ${{ github.ref != 'refs/heads/main' }}
       - name: Build
         run: |
           stack build --ghc-options -O2
@@ -52,21 +32,6 @@ jobs:
           stack install --local-bin-path ${{ matrix.asset_name }}/
           tar -Jcvf ${{ matrix.asset_name }}.tar.xz ${{ matrix.asset_name }}/
 
-  publish:
-    name: Publish binaries
-    needs: build-release
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            artifact_name: demake
-            asset_name: demake-linux-x86_64
-          - os: macos-latest
-            artifact_name: demake
-            asset_name: demake-macos-x86_64_osx
-
-    steps:
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
