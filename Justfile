@@ -89,5 +89,6 @@ update-examples:
     just run test/02.mk > examples/02-tasks.py
     git status examples/02-tasks.py || git commit -m "update 02-tasks.py"
 
+# Careful; automatically run in CI
 update-readme:
     just include-file-flt < readme.tmpl.md > README.md
