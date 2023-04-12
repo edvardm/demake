@@ -8,6 +8,7 @@ push = true
 
 [bumpver.file_patterns]
 "README.md" = ["{version}"]
+"app/Main.hs" = ['appVersion = "v{version}"']
 "readme.tmpl.md" = ["{version}"]
 "bumpver.toml" = ['current_version = "{version}"']
 "package.yaml" = ["version: {version}"]
