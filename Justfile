@@ -61,7 +61,7 @@ amend-if-changed:
     git status || git --amend --no-edit commit .
 
 # new version
-bump kind="minor": fmt amend-if-changed
+bump kind="patch": fmt amend-if-changed
     bumpver update --{{ kind }}
 
 # List TODOs
