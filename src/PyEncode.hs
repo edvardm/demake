@@ -19,7 +19,6 @@ import Data.String (IsString)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as L
 import Data.Text.Lazy.Builder
-import System.Posix.Escape (escape)
 import qualified Text.RE.PCRE as RE
 import Text.RE.Replace as REPL
 
@@ -129,7 +128,7 @@ instance Encodable InvFile where
             _ -> False
 
 instance Encodable PyEntry where
-    encode (PyConst (Const k v)) = bld [k, " = ", quoteVar v]
+    encode (PyConst (Const k v')) = bld [k, " = ", quoteExpr v']
     encode (PyTask t) = encode t
 
 instance Encodable [InvDep] where
@@ -155,9 +154,10 @@ instance Encodable InvCmd where
                 <> fromText ")"
                 <> nl
       where
-        formatCmd = fStringFmt . (escape . T.unpack) . stripAtChar . rmNlsTabs
+        formatCmd = fStringFmt . T.unpack . quoteExpr . escapeQuotes . stripAtChar . rmNlsTabs
         rmNlsTabs = T.replace "\t" "" . T.replace "\\\n" " "
         stripAtChar = T.dropWhile (== '@')
+        escapeQuotes = T.replace "\"" "\\\""
         fStringFmt src =
             let re = [RE.re|\$\($(.*?)\)|]
                 subst =
@@ -183,9 +183,6 @@ asString = T.unpack . L.toStrict . toLazyText . encode
 -- return first list if it is not empty, otherwise return second
 takeList :: [a] -> [a] -> [a]
 takeList as bs = if null as then bs else as
-
-quoteVar :: (Semigroup a, IsString a) => a -> a
-quoteVar v = "\"" <> v <> "\""
 
 none :: Foldable t => (a -> Bool) -> t a -> Bool
 none f = not . any f
@@ -224,3 +221,6 @@ topoSort tasks = reverse topoSorted
 
 mkGraph :: [Task] -> (Graph, Vertex -> AdjTuple, TaskName -> Maybe Vertex)
 mkGraph = G.graphFromEdges . map (\t -> (t, name t, map depName $ dependencies t))
+
+quoteExpr :: (Semigroup a, IsString a) => a -> a
+quoteExpr e = "\"" <> e <> "\""

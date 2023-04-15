@@ -33,6 +33,7 @@ dependencies:
   - regex
   - regex-with-pcre
   - directory
+  - sv
 
 ghc-options:
   # - -Weverything
