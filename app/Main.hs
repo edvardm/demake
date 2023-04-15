@@ -12,6 +12,9 @@ import System.Directory (doesFileExist)
 import System.Exit (die)
 import Text.Pretty.Simple
 
+appVersion :: String
+appVersion = "v0.1.4"
+
 data Args = Args
   { file :: String
   , debug :: Bool
@@ -92,8 +95,9 @@ writer outFile = case outFile of
 main :: IO ()
 main = run =<< execParser opts
  where
+  version = infoOption appVersion (long "version" <> help "Show version")
   opts =
-    info (helper <*> input) $
+    info (helper <*> version <*> input) $
       fullDesc
         <> header "demake -- Makefile to invoke converter"
         <> progDesc "Generate PyInvoke stub from given Makefile"

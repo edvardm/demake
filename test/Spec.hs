@@ -22,6 +22,9 @@ taskNames = map f
 makeRulesToTasknames :: Makefile -> [TaskName]
 makeRulesToTasknames = taskNames . toPyEntries
 
+lineComment :: Text -> Maybe LineComment
+lineComment = Just . LineComment
+
 main :: IO ()
 main = hspec $ do
   describe "Parsing Makefile" $ do
@@ -51,10 +54,10 @@ main = hspec $ do
         ]
         `shouldBe` Right Makefile{entries = [Conditional]}
 
-  it "parses comments" $ do
-    textToMake
-      ["include foo  # a comment"]
-      `shouldBe` Right Makefile{entries = [Include "foo" (Just $ LineComment "a comment")]}
+    it "parses comments" $ do
+      textToMake
+        ["include foo  # a comment"]
+        `shouldBe` Right Makefile{entries = [Include "foo" (lineComment "a comment")]}
 
   describe "Makefile to Pyinvoke" $ do
     -- TODO: create helper fun for toPyEntries Makefile entries...
@@ -111,7 +114,7 @@ main = hspec $ do
           , ""
           , "@task"
           , "def clean(c):"
-          , "    c.run(f'rm -rf {BIN}')"
+          , "    c.run(f\"rm -rf {BIN}\")"
           ]
 
     it "replaces all vars in a string" $ do
@@ -133,7 +136,7 @@ main = hspec $ do
           , ""
           , "@task"
           , "def clean(c):"
-          , "    c.run(f'rm -rf {BIN} {target}')"
+          , "    c.run(f\"rm -rf {BIN} {target}\")"
           ]
 
     -- FIXME: opts should be split to different types, not just simple string
@@ -256,13 +259,13 @@ main = hspec $ do
 
   describe "Commands" $ do
     it "wraps command in quotes" $ do
-      asString (InvCmd "ls -l") `shouldBe` "    c.run('ls -l')\n"
+      asString (InvCmd "ls -l") `shouldBe` "    c.run(\"ls -l\")\n"
 
     it "double-escapes escaped quotes in commands" $ do
-      asString (InvCmd "ls \"fname\"") `shouldBe` "    c.run('ls \"fname\"')\n"
+      asString (InvCmd "ls \"fname\"") `shouldBe` "    c.run(\"ls \\\"fname\\\"\")\n"
 
     it "ignores preceding at-char in commands" $ do
-      asString (InvCmd "@touch $!") `shouldBe` "    c.run('touch $!')\n"
+      asString (InvCmd "@touch $!") `shouldBe` "    c.run(\"touch $!\")\n"
 
   describe "Comments" $ do
     it "renders comments" $ do
@@ -271,6 +274,4 @@ main = hspec $ do
   describe "Includes" $ do
     it "skips includes (convert those separately for now)" $ do
       entryToTaskM (Include "foo" Nothing) `shouldBe` Nothing
-      entryToTaskM (Include "foo" lcom) `shouldBe` Nothing
- where
-  lcom = Just $ LineComment "asdf"
+      entryToTaskM (Include "foo" (lineComment "bar")) `shouldBe` Nothing
