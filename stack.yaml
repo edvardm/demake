@@ -9,6 +9,5 @@ extra-deps:
   - ghc-syb-utils-0.2.3.3@sha256:fc4cd944bbd4d5160b2ee8bb458974a135c0abbd9941fb6e5f9180164efd091a,1302
   - posix-escape-0.1@sha256:adbb650397cd8685ea220b40739ee80d4e8329643a98aa2993a6f13a598bd18c,1160
   - fourmolu-0.8.2.0
-  - sv-0.1
 
 resolver: lts-18.5

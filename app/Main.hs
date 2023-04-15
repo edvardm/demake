@@ -65,14 +65,12 @@ run Args{file = f, debug = False, output = optOutfile, force = optForce, parseOn
     >>= writer optOutfile
       . asString
       . toPyEntries
-
 run Args{file = f, debug = True, output = optOutfile, force = optForce, parseOnly = False} =
   do
     abortIfExists optOutfile optForce
     mkFl <- parseFile f
     debugParsed mkFl
     (writer optOutfile . asString . toPyEntries) mkFl
-
 run Args{file = f, parseOnly = True} = parseFile f >>= debugParsed
 
 debugParsed :: Makefile -> IO ()

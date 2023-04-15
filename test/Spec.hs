@@ -22,6 +22,9 @@ taskNames = map f
 makeRulesToTasknames :: Makefile -> [TaskName]
 makeRulesToTasknames = taskNames . toPyEntries
 
+lineComment :: Text -> Maybe LineComment
+lineComment = Just . LineComment
+
 main :: IO ()
 main = hspec $ do
   describe "Parsing Makefile" $ do
@@ -51,10 +54,10 @@ main = hspec $ do
         ]
         `shouldBe` Right Makefile{entries = [Conditional]}
 
-  it "parses comments" $ do
-    textToMake
-      ["include foo  # a comment"]
-      `shouldBe` Right Makefile{entries = [Include "foo" (Just $ LineComment "a comment")]}
+    it "parses comments" $ do
+      textToMake
+        ["include foo  # a comment"]
+        `shouldBe` Right Makefile{entries = [Include "foo" (lineComment "a comment")]}
 
   describe "Makefile to Pyinvoke" $ do
     -- TODO: create helper fun for toPyEntries Makefile entries...
@@ -271,6 +274,4 @@ main = hspec $ do
   describe "Includes" $ do
     it "skips includes (convert those separately for now)" $ do
       entryToTaskM (Include "foo" Nothing) `shouldBe` Nothing
-      entryToTaskM (Include "foo" lcom) `shouldBe` Nothing
- where
-  lcom = Just $ LineComment "asdf"
+      entryToTaskM (Include "foo" (lineComment "bar")) `shouldBe` Nothing
