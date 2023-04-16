@@ -51,6 +51,7 @@ assignment = do
 
 assignmentM :: Parser (AssignmentType, T.Text, T.Text)
 assignmentM = do
+    optional (string "export") *> A.skipSpace  -- we won't mimic semantics of exported varibles
     var <- variableName
     asgnT <- assignmentType
     val <- toEscapedLineEnd

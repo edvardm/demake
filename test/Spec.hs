@@ -59,8 +59,12 @@ main = hspec $ do
         ["include foo  # a comment"]
         `shouldBe` Right Makefile{entries = [Include "foo" (lineComment "a comment")]}
 
+    it "parses exported constants" $ do
+      textToMake
+        ["export DEBUG:=1"]
+        `shouldBe` Right Makefile{entries = [Assignment SimpleAssign "DEBUG" "1"]}
+
   describe "Makefile to Pyinvoke" $ do
-    -- TODO: create helper fun for toPyEntries Makefile entries...
     it "skips .PHONY declarations" $ do
       toPyEntries
         ( Makefile
